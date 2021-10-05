@@ -74,7 +74,6 @@ int main(
     posRightMovers.reserve(L);
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
     auto start = chrono::steady_clock::now();
 //#pragma omp parallel for num_threads(omp_get_num_procs())
     for(int count=0; count<N_of_samples; count++){
