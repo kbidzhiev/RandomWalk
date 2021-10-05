@@ -16,7 +16,7 @@ stats FILE nooutput
 
 set key c r
 
-set xrange [-2:2]
+set xrange [*:*]
 set yrange [0:1]
 set ylabel "Sz"
 set xlabel "x"

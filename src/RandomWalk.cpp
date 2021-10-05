@@ -28,7 +28,7 @@ const double dt =  0.1;
 
 const double prob_to_move = pow(dt, 1);
 
-const int N_of_samples = 1'000; //50000
+const int N_of_samples = 100'000; //50000
 
 int main(
 		//int argc, const char * argv[]
