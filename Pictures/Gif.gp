@@ -2,7 +2,7 @@
 ###########################################
 set terminal gif animate delay 5
 
-dt_from_cpp = '0.1';
+dt_from_cpp = '0.5';
 
 
 
@@ -16,7 +16,7 @@ stats FILE nooutput
 
 set key c r
 
-set xrange [*:*]
+set xrange [-2:2]
 set yrange [0:1]
 set ylabel "Sz"
 set xlabel "x"
@@ -33,7 +33,7 @@ col6="dark-violet";
 
 f(x) = x;
 do for [i=1:int(STATS_blocks)-1: floor(1.0/dt)] {
-    plot FILE index (i) u ($1/sqrt(i)):($2) w p pt cir ps 1.5 lt rgb "red" title columnheader
+    plot FILE index (i) u ($1/sqrt(i)):($2*sqrt(i)) w p pt cir ps 1.5 lt rgb "red" title columnheader
 }
 
 

@@ -21,14 +21,14 @@ using namespace std;
 
 
 
-const int L = 144; //4*250
-const int T = sqrt(L); // 20000
+const int L = 60; //4*250
+const int T = L/2; // 20000
 
-const double dt =  0.1;
+const double dt =  0.5;
 
 const double prob_to_move = pow(dt, 1);
 
-const int N_of_samples = 100'000; //50000
+const int N_of_samples = 1; //50000
 
 int main(
 		//int argc, const char * argv[]
@@ -66,7 +66,7 @@ int main(
     uniform_real_distribution<double> distReal(0,1);
 
 //    double prob = 0.5; // = 1/6 //
-    vector<int> config(L,0);
+    //vector<int> config(L,0);
     vector<int> posLeftMovers;
     vector<int> posRightMovers;
     posLeftMovers.reserve(L);
@@ -77,38 +77,19 @@ int main(
 //#pragma omp parallel for num_threads(omp_get_num_procs())
     for(int count=0; count<N_of_samples; count++){
 
-    	//initial state
-    	for (size_t j = 0; j < L ; j++) {
-    		config[j] = 0;
-//    		if (j % 2 == 0 ){
-//    			config[j] = 0;
-//    		} else {
-//    			config[j] = 1;
-//    		}
-    	}
 
+    	vector<int> config(L,0);
     	// local perturbation
     	config[L/2] = 1;
-//    	if(config[L/2] == 1) {
-//    		config[L/2]   = 0;
-//    	} else {
-//    		config[L/2+1] = 0;
-//    	}
-
-    	//config[L/2+1] = 0;
-
-//    	config[L/2+2] = 0;
-//    	config[L/2+3] = 0;
-
 
 
     	for (size_t n_evol = 0; n_evol < Evolution_steps; ++n_evol){
     		//cout << n_evol<< endl;
       	   // saving the positions of movable triples
-			for (size_t j = 1; j < L; j++) {
-				if (config[j - 1] == 0 && config[j] == 1) {
+			for (size_t j = 0; j < L-1; j++) {
+				if (config[j] == 1 && config[j+1] == 0) {
 					posRightMovers.push_back(j);
-				} else if (config[j - 1] == 1 && config[j] == 0) {
+				} else if (config[j] == 0 && config[j +  1] == 1) {
 					posLeftMovers.push_back(j);
 				}
 			}
@@ -121,22 +102,25 @@ int main(
 			double prob = distReal(generator);
 
 			if (posLeftMovers.size() != 0 && posRightMovers.size() != 0){
-				if (prob < prob_to_move) {
-					config[posLeftMovers[0] - 1] = 0;
-					config[posLeftMovers[0] + 0] = 1;
-				} else if (prob >= 1. - prob_to_move) {
-					config[posRightMovers[0] - 1] = 1;
-					config[posRightMovers[0] + 0] = 0;
-				}
-			} else if (posLeftMovers.size() == 0){
-				if (prob < prob_to_move/2.0) {
-					config[posRightMovers[0] - 1] = 1;
-					config[posRightMovers[0] + 0] = 0;
+				if (prob <= prob_to_move) {
+					config[posLeftMovers[0]    ] = 1;
+					config[posLeftMovers[0] + 1] = 0;
+				} else if (prob > prob_to_move && prob <= 2*prob_to_move) {
+					config[posRightMovers[0]   ] = 0;
+					config[posRightMovers[0] + 1] = 1;
+				} else {
+					cout << "Rear event" << endl;
+					terminate();
 				}
 			} else if (posRightMovers.size() == 0){
 				if (prob < prob_to_move/2.0 ) {
-					config[posLeftMovers[0] - 1] = 0;
 					config[posLeftMovers[0] + 0] = 1;
+					config[posLeftMovers[0] + 1] = 0;
+				}
+			} else if (posLeftMovers.size() == 0){
+				if (prob < prob_to_move/2.0) {
+					config[posRightMovers[0] + 0] = 0;
+					config[posRightMovers[0] + 1] = 1;
 				}
 			} else {
 				cout << "No particles to move " << endl;
@@ -158,7 +142,11 @@ int main(
 			}
 		}
 
-	if(count%100==0) cout << "Done: " << count/1000 + 1 << " / " << N_of_samples/1000 << endl;
+	if( (N_of_samples/(count+1)) %10 == 0) {
+		cout << (N_of_samples/(count+1)) << "\t" ;
+		cout << "Done: " << (1.0*count)/N_of_samples << "%" << endl;
+	}
+
     }
     auto end = chrono::steady_clock::now();
 
@@ -191,7 +179,7 @@ int main(
     myFile.close();
     sz_strm. close();
 
-    cout << "Elapsed time: " << "\t" << chrono::duration_cast<chrono::seconds>(end - start).count() << endl;
+    cout << "Computation time: " << "\t" << chrono::duration_cast<chrono::seconds>(end - start).count() << endl;
 
 
 
