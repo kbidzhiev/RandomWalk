@@ -55,7 +55,6 @@ int main(
 	sz_strm << "# x \t sigma_z \t t" << endl;
 
     ////////////////////////////////////////////////////////////////
-
 	const int Evolution_steps = T/dt;
     vector<vector<double> > contAvg(Evolution_steps, vector<double>(L,0)); // vector<T> vec (how many elements, initialize by {.} )
     vector<vector<double> > contDev(contAvg);
