@@ -26,7 +26,6 @@ const int T = sqrt(L); // 20000
 
 const double dt =  0.1;
 
-
 const double prob_to_move = pow(dt, 1);
 
 const int N_of_samples = 1'000; //50000
