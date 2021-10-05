@@ -110,7 +110,7 @@ int main(
 			for (size_t j = 1; j < L; j++) {
 				if (config[j - 1] == 0 && config[j] == 1) {
 					posRightMovers.push_back(j);
-				} else (config[j - 1] == 1 && config[j] == 0) {
+				} else if (config[j - 1] == 1 && config[j] == 0) {
 					posLeftMovers.push_back(j);
 				}
 			}
