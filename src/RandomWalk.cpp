@@ -65,7 +65,6 @@ int main(
     uniform_real_distribution<double> distReal(0,1);
 
 //    double prob = 0.5; // = 1/6 //
-    //vector<int> config(L,0);
     vector<int> posLeftMovers;
     vector<int> posRightMovers;
     posLeftMovers.reserve(L);
