@@ -26,7 +26,7 @@ const int T = L/2; // 20000
 
 const double dt =  0.1;
 
-const double prob_to_move = dt;
+const double prob_to_move = pow(dt,0.5);
 
 const int N_of_samples = 100'000; //50000
 
@@ -60,7 +60,6 @@ int main(
 	const int Evolution_steps = T/dt;
     vector<vector<double> > contAvg(Evolution_steps, vector<double>(L,0)); // vector<T> vec (how many elements, initialize by {.} )
     vector<vector<double> > contDev(contAvg);
-
 
     random_device rd;  // Will be used to obtain a seed for the random number engine
     mt19937 generator(rd()); // Standard mersenne_twister_engine seeded with rd()
@@ -109,11 +108,10 @@ int main(
 		// we start collecting data
 
 			for (int j = 0; j < L; j++) {
-				contDev[n_evol][j] = (contDev[n_evol][j] + (1.0 * config[j] - contAvg[n_evol][j]) * (1.0 * config[j] - contAvg[n_evol][j])
-								/ (count + 1)) * count / (count + 1);
+				//contDev[n_evol][j] = (contDev[n_evol][j] + (1.0 * config[j] - contAvg[n_evol][j]) * (1.0 * config[j] - contAvg[n_evol][j])
+				//				/ (count + 1)) * count / (count + 1);
 				contAvg[n_evol][j] = (config[j] + 1.0 * count * contAvg[n_evol][j])	/ (count + 1.0);
 				//contAvg[n_evol][j] = (config[j] + 1 * contAvg[n_evol][j])	;
-
 			}
 		}
 
@@ -130,25 +128,26 @@ int main(
     for (auto &vec : contAvg){
     	int i = -vec.size()/2;
 		if (true || n_evol % 10 == 0 ) {
-			sz_strm << "\"t=" << n_evol << "\"\n" << endl;
+			sz_strm << "\"t=" << dt * n_evol << "\"\n\n" ;
 			for (auto elem : vec) {
 				sz_strm << i++ << "\t" << elem << "\t" << n_evol << "\n";
-				myFile << elem << "\t\t\t";
+				//myFile << elem << "\t\t\t";
 			}
-			sz_strm << "\n" << endl;
+			sz_strm << "\n\n";
 		}
 		n_evol++;
 
 
     }
-    myFile << endl;
+    sz_strm << endl;
+    //myFile << endl;
 
-    for(auto &vec: contDev){
-        for(auto elem : vec){
-        	myFile << elem << "\t\t\t";
-        }
-        myFile << endl;
-    }
+//    for(auto &vec: contDev){
+//        for(auto elem : vec){
+//        	myFile << elem << "\t\t\t";
+//        }
+//        myFile << endl;
+//    }
 
 
     myFile.close();
