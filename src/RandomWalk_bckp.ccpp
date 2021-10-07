@@ -21,18 +21,18 @@ using namespace std;
 
 
 
-const int L = 100; //4*250
-const int T = L/2; // 20000
 
-const double dt =  0.1;
+int main2() {
 
-const double prob_to_move = dt;
+	const int L = 101; //4*250
+	const int T = L/2; // 20000
 
-const int N_of_samples = 100'000; //50000
+	const double dt =  0.5;
 
-int main(
-		//int argc, const char * argv[]
-									 ) {
+	const double prob_to_move = dt;
+
+	const int N_of_samples = 1'000;
+
 
 	if (prob_to_move > 0.5 || prob_to_move < 0){
 		cout << "Probability should be in a range [0:1]" << endl;
@@ -64,8 +64,8 @@ int main(
 
     random_device rd;  // Will be used to obtain a seed for the random number engine
     mt19937 generator(rd()); // Standard mersenne_twister_engine seeded with rd()
-    std::uniform_real_distribution<> distReal(0.0, 1.0);
 
+//    double prob = 0.5; // = 1/6 //
     vector<int> posLeftMovers;
     vector<int> posRightMovers;
     posLeftMovers.reserve(L);
@@ -78,40 +78,59 @@ int main(
 
     	vector<int> config(L,0);
     	// local perturbation
-    	int particle_position = L/2;
-    	config[particle_position] = 1;
-
-    	int jump_distance = 1;
-    	auto do_jump = [&](int& position_a, int distance){
-    		swap(config[position_a],config[position_a + distance]);
-    		position_a += distance;
-    	};
-
+    	config[L/2] = 1;
 
     	for (size_t n_evol = 0; n_evol < Evolution_steps; ++n_evol){
+    		//cout << n_evol<< endl;
+      	   // saving the positions of movable triples
+			for (size_t j = 0; j < L-1; j++) {
+				if (config[j] == 1 && config[j+1] == 0) {
+					posRightMovers.push_back(j);
+				}
+				else if (config[j] == 0 && config[j+1] == 1) {
+					posLeftMovers.push_back(j);
+				}
+			}
 
+      	    int size = posLeftMovers.size();
+      	    uniform_int_distribution<int> distPosition(0,posRightMovers.size()+size-1);
+      	    //int pos = distPosition(generator);
+			std::uniform_real_distribution<> distReal(0.0, 1.0);
 			double prob = distReal(generator);
 
-			if(particle_position > jump_distance && particle_position < L-jump_distance ){
-				if(prob < prob_to_move){
-					do_jump(particle_position, -jump_distance);
-				} else if (prob > 1 - prob_to_move){
-					do_jump(particle_position, jump_distance);
-				} else {
-					// we don't move, just stay at the same position
+			if (posLeftMovers.size() != 0 && posRightMovers.size() != 0){
+				if (prob < prob_to_move) {
+					swap(config[posLeftMovers.front()],config[posLeftMovers.front()+1] );
+				} else  {
+					swap(config[posRightMovers.front()],config[posRightMovers.front() + 1] );
 				}
-			} else if (particle_position <= jump_distance){
-				do_jump(particle_position, jump_distance);
-			} else if (particle_position >= L - jump_distance){
-				do_jump(particle_position, -jump_distance);
+			} else if (posRightMovers.size() == 0){
+				cout << "Can not move to right" << endl;
+				terminate();
+				if (prob < prob_to_move) {
+					swap(config[posLeftMovers.front()],config[posLeftMovers.front()+1] );
+				}
+			} else if (posLeftMovers.size() == 0){
+				cout << "Can not move to left" << endl;
+				terminate();
+				if (prob < prob_to_move) {
+					swap(config[posRightMovers.front()],config[posRightMovers.front() + 1] );
+				}
+			} else {
+				cout << "No particles to move " << endl;
+				exit(1);
 			}
+
+
+     	  	posLeftMovers.clear();
+      	   	posRightMovers.clear();
 
 		// we start collecting data
 
 			for (int j = 0; j < L; j++) {
 				contDev[n_evol][j] = (contDev[n_evol][j] + (1.0 * config[j] - contAvg[n_evol][j]) * (1.0 * config[j] - contAvg[n_evol][j])
 								/ (count + 1)) * count / (count + 1);
-				contAvg[n_evol][j] = (config[j] + 1.0 * count * contAvg[n_evol][j])	/ (count + 1.0);
+				contAvg[n_evol][j] = (config[j] + count * contAvg[n_evol][j])	/ (count + 1);
 				//contAvg[n_evol][j] = (config[j] + 1 * contAvg[n_evol][j])	;
 
 			}
