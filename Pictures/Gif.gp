@@ -2,7 +2,7 @@
 ###########################################
 set terminal gif animate delay 5
 
-dt_from_cpp = '0.1';
+dt_from_cpp = '0.05';
 
 
 
@@ -20,7 +20,7 @@ stats FILE nooutput
 set key t r
 
 set xrange [-4:4]
-set yrange [0:0.5]
+set yrange [0:1]
 set ylabel "Sz * sqrt(2 prob * n)"
 set xlabel "x/sqrt(2 prob * n)"
 percentile="P5 P10 P20 P25 P50 P75"
@@ -35,8 +35,8 @@ col6="dark-violet";
 
 
 
-#floor(1.0/dt)
-step = 1;
+step=floor(1.0/dt)
+#step = 1;
 
 
 coeff= 2*dt;
