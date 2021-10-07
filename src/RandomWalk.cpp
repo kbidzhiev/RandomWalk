@@ -12,6 +12,7 @@
 #include <chrono>
 #include <random>
 #include <numeric>
+#include <cmath>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -21,12 +22,12 @@ using namespace std;
 
 
 
-const int L = 100; //4*250
+const int L = 400; //4*250
 const int T = L/2; // 20000
 
 const double dt =  0.1;
 
-const double prob_to_move = pow(dt,0.5);
+const double prob_to_move = pow(dt,1);
 
 const int N_of_samples = 100'000; //50000
 
@@ -75,8 +76,17 @@ int main(
 //#pragma omp parallel for num_threads(omp_get_num_procs())
     for(int count=0; count<N_of_samples; count++){
 
-    	vector<int> config(L,0);
+//    	vector<int> config(L,1);
+//    	for(size_t i = 0; i < config.size(); ++i){
+//    		if (i % 3 ==0 ){
+//    			config[i] = 0;
+//    		}
+//    	}
+
     	// local perturbation
+
+    	vector<int> config(L,0);
+
     	int particle_position = L/2;
     	config[particle_position] = 1;
 
@@ -115,12 +125,12 @@ int main(
 			}
 		}
 
-	if( (N_of_samples/(count+1)) %10 == 0) {
-		cout << (N_of_samples/(count+1)) << "\t" ;
-		cout << "Done: " << (10.0*count)/N_of_samples << "%" << endl;
-	}
 
+    	if(floor(100.0*count/N_of_samples) < floor(100.0*(count+1)/N_of_samples)){
+    		cout << "Done: " << (count+1.0) / N_of_samples << "%" << endl;
+    	}
     }
+
     auto end = chrono::steady_clock::now();
 
     // writting to a file
@@ -136,8 +146,6 @@ int main(
 			sz_strm << "\n\n";
 		}
 		n_evol++;
-
-
     }
     sz_strm << endl;
     //myFile << endl;
@@ -149,9 +157,9 @@ int main(
 //        myFile << endl;
 //    }
 
-
     myFile.close();
     sz_strm. close();
+
 
     cout << "Computation time: " << "\t" << chrono::duration_cast<chrono::seconds>(end - start).count() << endl;
 
