@@ -18,18 +18,21 @@
 #include <string>
 #include <omp.h>
 
+#include "Classic_walk.hpp"
+#include "Folded_walk.hpp"
+
 using namespace std;
 
 
 
-const int L = 400; //4*250
-const int T = L/2; // 20000
+const size_t System_size = 400; //4*250
+const size_t T = System_size /2; // 20000
 
 const double dt =  0.1;
 
 const double prob_to_move = pow(dt,1);
 
-const int N_of_samples = 100'000; //50000
+const int N_of_samples = 1'000; //50000
 
 int main(
 		//int argc, const char * argv[]
@@ -59,7 +62,7 @@ int main(
 
     ////////////////////////////////////////////////////////////////
 	const int Evolution_steps = T/dt;
-    vector<vector<double> > contAvg(Evolution_steps, vector<double>(L,0)); // vector<T> vec (how many elements, initialize by {.} )
+    vector<vector<double> > contAvg(Evolution_steps, vector<double>(System_size ,0)); // vector<T> vec (how many elements, initialize by {.} )
     vector<vector<double> > contDev(contAvg);
 
     random_device rd;  // Will be used to obtain a seed for the random number engine
@@ -68,56 +71,30 @@ int main(
 
     vector<int> posLeftMovers;
     vector<int> posRightMovers;
-    posLeftMovers.reserve(L);
-    posRightMovers.reserve(L);
+    posLeftMovers.reserve(System_size );
+    posRightMovers.reserve(System_size );
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     auto start = chrono::steady_clock::now();
 //#pragma omp parallel for num_threads(omp_get_num_procs())
     for(int count=0; count<N_of_samples; count++){
 
-//    	vector<int> config(L,1);
-//    	for(size_t i = 0; i < config.size(); ++i){
-//    		if (i % 3 ==0 ){
-//    			config[i] = 0;
-//    		}
-//    	}
+    	size_t particle_position = System_size /2;
+    	vector<int> config = initialState_Folded(particle_position , System_size );
 
-    	// local perturbation
 
-    	vector<int> config(L,0);
 
-    	int particle_position = L/2;
-    	config[particle_position] = 1;
 
-    	int jump_distance = 1;
-    	auto do_jump = [&](int& position_a, int distance){
-    		swap(config[position_a],config[position_a + distance]);
-    		position_a += distance;
-    	};
 
 
     	for (size_t n_evol = 0; n_evol < Evolution_steps; ++n_evol){
 
-			double prob = distReal(generator);
 
-			if(particle_position > jump_distance && particle_position < L-jump_distance ){
-				if(prob < prob_to_move){
-					do_jump(particle_position, -jump_distance);
-				} else if (prob > 1 - prob_to_move){
-					do_jump(particle_position, jump_distance);
-				} else {
-					// we don't move, just stay at the same position
-				}
-			} else if (particle_position <= jump_distance){
-				do_jump(particle_position, jump_distance);
-			} else if (particle_position >= L - jump_distance){
-				do_jump(particle_position, -jump_distance);
-			}
+    		evolveState_Classic(config, prob_to_move);
 
 		// we start collecting data
 
-			for (int j = 0; j < L; j++) {
+			for (size_t j = 0; j < System_size ; j++) {
 				//contDev[n_evol][j] = (contDev[n_evol][j] + (1.0 * config[j] - contAvg[n_evol][j]) * (1.0 * config[j] - contAvg[n_evol][j])
 				//				/ (count + 1)) * count / (count + 1);
 				contAvg[n_evol][j] = (config[j] + 1.0 * count * contAvg[n_evol][j])	/ (count + 1.0);
