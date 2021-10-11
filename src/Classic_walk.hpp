@@ -20,7 +20,7 @@ vector<int> initialState_Classic(const size_t flip_position, const size_t System
 }
 
 
-void do_jump (vector<int>& config, int particle_position){
+void do_jump_Classic (vector<int>& config, int particle_position){
 	size_t distance = 1;
 	swap(config[particle_position],config[particle_position + distance]);
 };
@@ -39,15 +39,15 @@ void evolveState_Classic(vector<int>& config, double prob_to_move){
 	if (particle_position > jump_distance
 			&& particle_position < (System_size - jump_distance)) {
 		if (prob < prob_to_move) {
-			do_jump(config, -particle_position);
+			do_jump_Classic(config, -particle_position);
 		} else if (prob > 1 - prob_to_move) {
-			do_jump(config, particle_position);
+			do_jump_Classic(config, particle_position);
 		} else {
 			// we don't move, just stay at the same position
 		}
 	} else if (particle_position <= jump_distance) {
-		do_jump(config, particle_position);
+		do_jump_Classic(config, particle_position);
 	} else if (particle_position >= System_size - jump_distance) {
-		do_jump(config, -particle_position);
+		do_jump_Classic(config, -particle_position);
 	}
 }
