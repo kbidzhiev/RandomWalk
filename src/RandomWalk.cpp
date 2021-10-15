@@ -79,10 +79,8 @@ int main(
 //#pragma omp parallel for num_threads(omp_get_num_procs())
     for(int count=0; count<N_of_samples; count++){
 
-    	size_t particle_position = System_size /2;
-    	vector<int> config = initialState_Folded(particle_position , System_size );
-
-
+    	size_t flip_position = System_size /2;
+    	vector<int> config = initialState_Classic(flip_position, System_size);
 
 
 
@@ -104,7 +102,7 @@ int main(
 
 
     	if(floor(100.0*count/N_of_samples) < floor(100.0*(count+1)/N_of_samples)){
-    		cout << "Done: " << (count+1.0) / N_of_samples << "%" << endl;
+    		cout << "Done: " << 100*(count+1.0) / N_of_samples << "%" << endl;
     	}
     }
 
